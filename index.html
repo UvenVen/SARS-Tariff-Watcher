@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watch Log — Tariff Amendments Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1b2a44;
+    --ink-soft: #3a4a68;
+    --paper: #f6f4ec;
+    --paper-line: #ded8c4;
+    --brass: #a6812f;
+    --brass-light: #cfa94a;
+    --clear: #2f6b4f;
+    --clear-bg: #e7efe9;
+    --flag: #a13d2b;
+    --flag-bg: #f6e6e1;
+    --error: #8a2f2f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 32px;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+
+  header {
+    border-bottom: 3px double var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .masthead-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 700;
+    font-size: 34px;
+    margin: 0;
+    line-height: 1.05;
+  }
+
+  .target-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid var(--paper-line);
+    max-width: 280px;
+    text-align: right;
+    word-break: break-all;
+  }
+  .target-link:hover { color: var(--brass); border-color: var(--brass); }
+
+  /* Seal */
+  .seal-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 36px 0 40px;
+  }
+
+  .seal {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    border: 3px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    transform: rotate(-6deg);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .seal::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+  .seal-text {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .seal.clear { color: var(--clear); }
+  .seal.flag { color: var(--flag); }
+  .seal.pending { color: var(--ink-soft); }
+
+  .seal-caption .status-line {
+    font-family: 'Source Serif 4', serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .seal-caption .status-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  /* Log */
+  .log-heading {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--paper-line);
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 18px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--paper-line);
+  }
+
+  .entry-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding-top: 3px;
+  }
+  .entry-date .time { display: block; opacity: 0.65; margin-top: 2px; }
+
+  .entry-body { min-width: 0; }
+
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .badge.changed { background: var(--flag-bg); color: var(--flag); }
+  .badge.unchanged { background: var(--clear-bg); color: var(--clear); }
+  .badge.baseline { background: #eee8d6; color: var(--brass); }
+  .badge.error { background: #f4e1e1; color: var(--error); }
+
+  .entry-detail {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .entry-detail ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+  }
+  .entry-detail li {
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .empty-state {
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    padding: 40px 0;
+    text-align: center;
+  }
+
+  .config-note {
+    margin-top: 40px;
+    padding: 16px 18px;
+    background: #fff9e8;
+    border: 1px solid var(--brass-light);
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    display: none;
+  }
+  .config-note.show { display: block; }
+  .config-note code { color: var(--ink); }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--paper-line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="masthead-eyebrow">Watch Log · No. 001</div>
+      <h1>Tariff&nbsp;Amendments<br>Monitor</h1>
+    </div>
+    <a class="target-link" id="target-link" href="#" target="_blank" rel="noopener">loading target…</a>
+  </header>
+
+  <div class="seal-row">
+    <div class="seal pending" id="seal">
+      <span class="seal-text" id="seal-text">···</span>
+    </div>
+    <div class="seal-caption">
+      <p class="status-line" id="status-line">Loading latest status…</p>
+      <p class="status-sub" id="status-sub">&nbsp;</p>
+    </div>
+  </div>
+
+  <p class="log-heading">Check history</p>
+  <div id="log"></div>
+  <div class="empty-state" id="empty-state" style="display:none;">No checks logged yet. Once the daily job runs, entries will appear here.</div>
+
+  <div class="config-note" id="config-note">
+    Couldn't load <code>data/history.json</code>. If you're viewing this on GitHub Pages,
+    make sure Pages is set to serve from the repo root (not <code>/docs</code>), and that
+    the GitHub Action has run at least once. If you're opening this file locally from disk,
+    that won't work — <code>fetch()</code> needs it served over http(s).
+  </div>
+
+  <footer>Checked daily via GitHub Actions · data/history.json</footer>
+</div>
+
+<script>
+async function loadData() {
+  const targetLink = document.getElementById('target-link');
+  const logEl = document.getElementById('log');
+  const emptyState = document.getElementById('empty-state');
+  const configNote = document.getElementById('config-note');
+  const seal = document.getElementById('seal');
+  const sealText = document.getElementById('seal-text');
+  const statusLine = document.getElementById('status-line');
+  const statusSub = document.getElementById('status-sub');
+
+  let history = [];
+  let snapshot = {};
+
+  try {
+    const [histRes, snapRes] = await Promise.all([
+      fetch('data/history.json', { cache: 'no-store' }),
+      fetch('data/last_snapshot.json', { cache: 'no-store' })
+    ]);
+    history = await histRes.json();
+    snapshot = await snapRes.json();
+  } catch (e) {
+    configNote.classList.add('show');
+  }
+
+  targetLink.href = "https://www.sars.gov.za/legal-counsel/secondary-legislation/tariff-amendments/tariff-amendments-2026/";
+  targetLink.textContent = "sars.gov.za/…/tariff-amendments-2026 ↗";
+
+  if (!history || history.length === 0) {
+    emptyState.style.display = 'block';
+    sealText.textContent = 'n/a';
+    statusLine.textContent = 'No checks run yet';
+    statusSub.textContent = 'Waiting for the first scheduled run';
+    return;
+  }
+
+  const latest = history[0];
+  if (latest.status === 'changed') {
+    seal.className = 'seal flag';
+    sealText.textContent = 'flagged';
+    statusLine.textContent = `${latest.added_count} new notice${latest.added_count === 1 ? '' : 's'} found`;
+  } else if (latest.status === 'baseline') {
+    seal.className = 'seal pending';
+    sealText.textContent = 'baseline';
+    statusLine.textContent = 'Baseline captured';
+  } else if (latest.status === 'error') {
+    seal.className = 'seal flag';
+    sealText.textContent = 'error';
+    statusLine.textContent = 'Last check failed';
+  } else {
+    seal.className = 'seal clear';
+    sealText.textContent = 'clear';
+    statusLine.textContent = 'No changes since last check';
+  }
+  statusSub.textContent = `Last checked ${formatDate(latest.timestamp)}`;
+
+  logEl.innerHTML = history.map(renderEntry).join('');
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('en-ZA', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+function renderEntry(entry) {
+  const d = new Date(entry.timestamp);
+  const dateStr = isNaN(d) ? '—' : d.toLocaleDateString('en-ZA', { day: '2-digit', month: 'short' });
+  const timeStr = isNaN(d) ? '' : d.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+
+  let badgeClass = 'unchanged', badgeLabel = 'No change';
+  if (entry.status === 'changed') { badgeClass = 'changed'; badgeLabel = 'Changed'; }
+  else if (entry.status === 'baseline') { badgeClass = 'baseline'; badgeLabel = 'Baseline'; }
+  else if (entry.status === 'error') { badgeClass = 'error'; badgeLabel = 'Error'; }
+
+  let detail = '';
+  if (entry.status === 'changed' && entry.added_preview && entry.added_preview.length) {
+    detail = '<ul>' + entry.added_preview.map(r => `<li>${escapeHtml(r)}</li>`).join('') + '</ul>';
+  } else if (entry.status === 'error') {
+    detail = `<div class="entry-detail">${escapeHtml(entry.message || 'Unknown error')}</div>`;
+  } else if (entry.status === 'baseline') {
+    detail = `<div class="entry-detail">Captured ${entry.row_count || 0} rows as the starting point.</div>`;
+  } else {
+    detail = `<div class="entry-detail">Page checked, ${entry.row_count || 0} rows, nothing new.</div>`;
+  }
+
+  return `
+    <div class="entry">
+      <div class="entry-date">${dateStr}<span class="time">${timeStr}</span></div>
+      <div class="entry-body">
+        <span class="badge ${badgeClass}">${badgeLabel}</span>
+        ${detail}
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+loadData();
+</script>
+</body>
+</html>
