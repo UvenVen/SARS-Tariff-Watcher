@@ -1,0 +1,43 @@
+name: Check Website Daily
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run checker
+        env:
+          TARGET_URL: ${{ vars.TARGET_URL }}
+          EMAIL_TO: ${{ vars.EMAIL_TO }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        run: python check_site.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "site-watcher-bot"
+          git config user.email "actions@github.com"
+          git add data/
+          git diff --quiet --cached || git commit -m "Update snapshot [skip ci]"
+          git push
