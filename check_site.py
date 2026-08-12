@@ -8,11 +8,11 @@ structure), diffs it against the previous run, and:
   - emails the user if new rows/entries were found
   - writes data/history.json (log of every check, used by the dashboard)
   - writes data/last_snapshot.json (the current state, for the next diff)
-
+ 
 Designed to run daily via GitHub Actions (see .github/workflows/check.yml)
 but works fine run locally too: `python check_site.py`
 """
-
+ 
 import os
 import sys
 import json
@@ -23,11 +23,11 @@ from datetime import datetime, timezone
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
-
+ 
 import requests
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
-
+ 
 # ---------------------------------------------------------------------------
 # Config (env vars are set via GitHub Actions secrets / workflow file)
 # ---------------------------------------------------------------------------
@@ -48,21 +48,21 @@ SCREENSHOT_PUBLIC_URL = (
     f"https://raw.githubusercontent.com/{GITHUB_REPOSITORY}/main/data/latest_screenshot.png"
     if GITHUB_REPOSITORY else ""
 )
-
+ 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SNAPSHOT_PATH = os.path.join(DATA_DIR, "last_snapshot.json")
 HISTORY_PATH = os.path.join(DATA_DIR, "history.json")
 SCREENSHOT_PATH = os.path.join(DATA_DIR, "latest_screenshot.png")
 MAX_HISTORY_ENTRIES = 200
-
+ 
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
         "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
     )
 }
-
-
+ 
+ 
 # ---------------------------------------------------------------------------
 # Fetch + extract
 # ---------------------------------------------------------------------------
@@ -70,8 +70,8 @@ def fetch_page(url: str) -> str:
     resp = requests.get(url, headers=HEADERS, timeout=30)
     resp.raise_for_status()
     return resp.text
-
-
+ 
+ 
 def extract_rows(html: str) -> list[str]:
     """
     Pull the main content table off the page and return each row as a
@@ -81,14 +81,14 @@ def extract_rows(html: str) -> list[str]:
     """
     soup = BeautifulSoup(html, "html.parser")
     tables = soup.find_all("table")
-
+ 
     if not tables:
         # Fallback: no table found, treat list items in the main content
         # area as "rows" instead, so the script still degrades gracefully.
         main = soup.find("main") or soup
         items = main.find_all("li")
         return [normalise(li.get_text(" ", strip=True)) for li in items if li.get_text(strip=True)]
-
+ 
     target_table = max(tables, key=lambda t: len(t.find_all("tr")))
     rows = []
     for tr in target_table.find_all("tr"):
@@ -96,22 +96,23 @@ def extract_rows(html: str) -> list[str]:
         if text:
             rows.append(text)
     return rows
-
-
+ 
+ 
 def normalise(text: str) -> str:
     return " ".join(text.split())
-
-
+ 
+ 
 def row_hash(row: str) -> str:
     return hashlib.sha256(row.encode("utf-8")).hexdigest()
-
-
+ 
+ 
 def take_screenshot(url: str, out_path: str):
-    """Screenshot of the visible top portion of the target page (not the full scrolled page)."""
+    """Screenshot of the visible top portion of the target page, tall enough to
+    reach past the site nav/banner and into the actual table entries."""
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch()
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
+            page = browser.new_page(viewport={"width": 1280, "height": 1600})
             page.goto(url, timeout=30000, wait_until="networkidle")
             page.screenshot(path=out_path, full_page=False)
             browser.close()
@@ -120,21 +121,21 @@ def take_screenshot(url: str, out_path: str):
     except Exception as e:
         print(f"Screenshot failed: {e}")
         return False
-
-
+ 
+ 
 # ---------------------------------------------------------------------------
 # Diff
 # ---------------------------------------------------------------------------
 def diff_rows(old_rows: list[str], new_rows: list[str]) -> dict:
     old_set = {row_hash(r): r for r in old_rows}
     new_set = {row_hash(r): r for r in new_rows}
-
+ 
     added = [new_set[h] for h in new_set if h not in old_set]
     removed = [old_set[h] for h in old_set if h not in new_set]
-
+ 
     return {"added": added, "removed": removed}
-
-
+ 
+ 
 def send_whatsapp(message: str):
     if not (WHATSAPP_PHONE and WHATSAPP_APIKEY):
         print("WhatsApp not configured (missing env vars) - skipping.")
@@ -148,8 +149,8 @@ def send_whatsapp(message: str):
         print(f"WhatsApp send status: {resp.status_code} - {resp.text[:200]}")
     except Exception as e:
         print(f"WhatsApp send failed: {e}")
-
-
+ 
+ 
 # ---------------------------------------------------------------------------
 # Email
 # ---------------------------------------------------------------------------
@@ -161,7 +162,7 @@ def send_email(subject: str, body_text: str, body_html: str | None = None, attac
         print(body_text)
         print("--------------------------")
         return
-
+ 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = EMAIL_FROM
@@ -169,20 +170,20 @@ def send_email(subject: str, body_text: str, body_html: str | None = None, attac
     msg.attach(MIMEText(body_text, "plain"))
     if body_html:
         msg.attach(MIMEText(body_html, "html"))
-
+ 
     if attachment_path and os.path.exists(attachment_path):
         with open(attachment_path, "rb") as f:
             img = MIMEImage(f.read(), name=os.path.basename(attachment_path))
         msg.attach(img)
-
+ 
     context = ssl.create_default_context()
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
         server.starttls(context=context)
         server.login(SMTP_USER, SMTP_PASS)
         server.sendmail(EMAIL_FROM, [EMAIL_TO], msg.as_string())
     print(f"Email sent to {EMAIL_TO}")
-
-
+ 
+ 
 def build_email_body(added: list[str], removed: list[str], row_count: int, changed: bool) -> tuple[str, str]:
     if changed:
         lines = [f"Changes detected on:\n{TARGET_URL}\n"]
@@ -201,7 +202,7 @@ def build_email_body(added: list[str], removed: list[str], row_count: int, chang
             f"Rows on page: {row_count}",
         ]
     text = "\n".join(lines)
-
+ 
     if changed:
         html_rows_added = "".join(f"<li style='margin-bottom:8px'>{r}</li>" for r in added)
         html_rows_removed = "".join(f"<li style='margin-bottom:8px'>{r}</li>" for r in removed)
@@ -221,8 +222,8 @@ def build_email_body(added: list[str], removed: list[str], row_count: int, chang
         </body></html>
         """
     return text, html
-
-
+ 
+ 
 # ---------------------------------------------------------------------------
 # Persistence
 # ---------------------------------------------------------------------------
@@ -231,28 +232,28 @@ def load_json(path, default):
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
     return default
-
-
+ 
+ 
 def save_json(path, data):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-
-
+ 
+ 
 def append_history(entry: dict):
     history = load_json(HISTORY_PATH, [])
     history.insert(0, entry)
     history = history[:MAX_HISTORY_ENTRIES]
     save_json(HISTORY_PATH, history)
-
-
+ 
+ 
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def main():
     now = datetime.now(timezone.utc).isoformat()
     print(f"[{now}] Checking {TARGET_URL}")
-
+ 
     try:
         html = fetch_page(TARGET_URL)
         new_rows = extract_rows(html)
@@ -266,21 +267,21 @@ def main():
             "removed_count": 0,
         })
         sys.exit(1)
-
+ 
     if not new_rows:
         print("WARNING: no rows extracted - page structure may have changed.")
-
+ 
     screenshot_ok = take_screenshot(TARGET_URL, SCREENSHOT_PATH)
     screenshot_for_email = SCREENSHOT_PATH if screenshot_ok else None
-
+ 
     snapshot = load_json(SNAPSHOT_PATH, {"rows": []})
     old_rows = snapshot.get("rows", [])
-
+ 
     is_first_run = len(old_rows) == 0
     diff = diff_rows(old_rows, new_rows)
-
+ 
     changed = bool(diff["added"] or diff["removed"])
-
+ 
     if is_first_run:
         print(f"First run - baseline captured ({len(new_rows)} rows). No email sent.")
         status = "baseline"
@@ -307,10 +308,10 @@ def main():
             wa_no_change += f"\n📸 {SCREENSHOT_PUBLIC_URL}"
         send_whatsapp(wa_no_change)
         status = "unchanged"
-
+ 
     # persist new snapshot
     save_json(SNAPSHOT_PATH, {"rows": new_rows, "checked_at": now})
-
+ 
     append_history({
         "timestamp": now,
         "status": status,
@@ -319,9 +320,9 @@ def main():
         "added_preview": [r[:200] for r in diff["added"][:5]],
         "row_count": len(new_rows),
     })
-
+ 
     print("Done.")
-
-
+ 
+ 
 if __name__ == "__main__":
     main()
