@@ -6,6 +6,7 @@ Fetches a target page, extracts the main table (the SARS tariff amendments
 table by default, but this works for any page with a comparable table/list
 structure), diffs it against the previous run, and:
   - emails + WhatsApps the user every check (heartbeat if unchanged, alert if new rows found)
+  - takes a full-page screenshot and attaches it to the email
   - writes data/history.json (log of every check, used by the dashboard)
   - writes data/last_snapshot.json (the current state, for the next diff)
 
@@ -21,10 +22,12 @@ import smtplib
 import ssl
 from datetime import datetime, timezone
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
 import requests
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 # ---------------------------------------------------------------------------
 # Config (env vars are set via GitHub Actions secrets / workflow file)
@@ -45,6 +48,7 @@ WHATSAPP_APIKEY = os.environ.get("WHATSAPP_APIKEY", "")
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SNAPSHOT_PATH = os.path.join(DATA_DIR, "last_snapshot.json")
 HISTORY_PATH = os.path.join(DATA_DIR, "history.json")
+SCREENSHOT_PATH = os.path.join(DATA_DIR, "latest_screenshot.png")
 MAX_HISTORY_ENTRIES = 200
 
 HEADERS = {
@@ -90,6 +94,22 @@ def row_hash(row: str) -> str:
     return hashlib.sha256(row.encode("utf-8")).hexdigest()
 
 
+def take_screenshot(url: str, out_path: str):
+    """Full-page screenshot of the target page, saved to out_path."""
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page(viewport={"width": 1280, "height": 900})
+            page.goto(url, timeout=30000, wait_until="networkidle")
+            page.screenshot(path=out_path, full_page=True)
+            browser.close()
+        print(f"Screenshot saved to {out_path}")
+        return True
+    except Exception as e:
+        print(f"Screenshot failed: {e}")
+        return False
+
+
 # ---------------------------------------------------------------------------
 # Diff
 # ---------------------------------------------------------------------------
@@ -121,7 +141,7 @@ def send_whatsapp(message: str):
 # ---------------------------------------------------------------------------
 # Email
 # ---------------------------------------------------------------------------
-def send_email(subject: str, body_text: str, body_html: str | None = None):
+def send_email(subject: str, body_text: str, body_html: str | None = None, attachment_path: str | None = None):
     if not (SMTP_HOST and SMTP_USER and SMTP_PASS and EMAIL_TO):
         print("SMTP not configured (missing env vars) - skipping email send.")
         print("---- Would have sent ----")
@@ -137,6 +157,11 @@ def send_email(subject: str, body_text: str, body_html: str | None = None):
     msg.attach(MIMEText(body_text, "plain"))
     if body_html:
         msg.attach(MIMEText(body_html, "html"))
+
+    if attachment_path and os.path.exists(attachment_path):
+        with open(attachment_path, "rb") as f:
+            img = MIMEImage(f.read(), name=os.path.basename(attachment_path))
+        msg.attach(img)
 
     context = ssl.create_default_context()
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
@@ -233,6 +258,9 @@ def main():
     if not new_rows:
         print("WARNING: no rows extracted - page structure may have changed.")
 
+    screenshot_ok = take_screenshot(TARGET_URL, SCREENSHOT_PATH)
+    screenshot_for_email = SCREENSHOT_PATH if screenshot_ok else None
+
     snapshot = load_json(SNAPSHOT_PATH, {"rows": []})
     old_rows = snapshot.get("rows", [])
 
@@ -248,7 +276,7 @@ def main():
         print(f"CHANGE DETECTED: +{len(diff['added'])} / -{len(diff['removed'])}")
         subject = f"🔔 Update on SARS Tariff Amendments 2026 page ({len(diff['added'])} new)"
         text, html_body = build_email_body(diff["added"], diff["removed"], len(new_rows), changed=True)
-        send_email(subject, text, html_body)
+        send_email(subject, text, html_body, attachment_path=screenshot_for_email)
         wa_lines = [f"🔔 SARS Tariff Amendments: {len(diff['added'])} new notice(s)"]
         for r in diff["added"][:5]:
             wa_lines.append(f"- {r[:150]}")
@@ -259,7 +287,7 @@ def main():
         print("No changes.")
         subject = "✅ Daily check: no changes — SARS Tariff Amendments 2026"
         text, html_body = build_email_body([], [], len(new_rows), changed=False)
-        send_email(subject, text, html_body)
+        send_email(subject, text, html_body, attachment_path=screenshot_for_email)
         send_whatsapp(f"✅ SARS Tariff Amendments: no changes ({len(new_rows)} rows checked)")
         status = "unchanged"
 
