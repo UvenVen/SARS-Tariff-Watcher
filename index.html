@@ -247,7 +247,7 @@
     </div>
   </div>
 
-  <img id="screenshot" src="data/latest_screenshot.png" alt="Latest page screenshot"
+  <img id="screenshot" alt="Latest page screenshot"
        style="width:100%; border:1px solid var(--paper-line); border-radius:4px; display:none; margin-bottom:32px;"
        onload="this.style.display='block'" onerror="this.style.display='none'">
 
@@ -302,6 +302,10 @@ async function loadData() {
   }
 
   const latest = history[0];
+  const screenshotEl = document.getElementById('screenshot');
+  if (screenshotEl && latest.timestamp) {
+    screenshotEl.src = `data/latest_screenshot.png?t=${encodeURIComponent(latest.timestamp)}`;
+  }
   if (latest.status === 'changed') {
     seal.className = 'seal flag';
     sealText.textContent = 'flagged';
