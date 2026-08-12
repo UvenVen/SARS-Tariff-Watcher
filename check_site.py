@@ -107,13 +107,13 @@ def row_hash(row: str) -> str:
 
 
 def take_screenshot(url: str, out_path: str):
-    """Full-page screenshot of the target page, saved to out_path."""
+    """Screenshot of the visible top portion of the target page (not the full scrolled page)."""
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch()
             page = browser.new_page(viewport={"width": 1280, "height": 900})
             page.goto(url, timeout=30000, wait_until="networkidle")
-            page.screenshot(path=out_path, full_page=True)
+            page.screenshot(path=out_path, full_page=False)
             browser.close()
         print(f"Screenshot saved to {out_path}")
         return True
