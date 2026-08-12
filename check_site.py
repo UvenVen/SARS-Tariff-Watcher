@@ -5,7 +5,7 @@ Website Watcher
 Fetches a target page, extracts the main table (the SARS tariff amendments
 table by default, but this works for any page with a comparable table/list
 structure), diffs it against the previous run, and:
-  - emails the user if new rows/entries were found
+  - emails + WhatsApps the user every check (heartbeat if unchanged, alert if new rows found)
   - writes data/history.json (log of every check, used by the dashboard)
   - writes data/last_snapshot.json (the current state, for the next diff)
 
@@ -39,6 +39,8 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
 EMAIL_FROM = os.environ.get("EMAIL_FROM", SMTP_USER)
+WHATSAPP_PHONE = os.environ.get("WHATSAPP_PHONE", "")
+WHATSAPP_APIKEY = os.environ.get("WHATSAPP_APIKEY", "")
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SNAPSHOT_PATH = os.path.join(DATA_DIR, "last_snapshot.json")
@@ -63,18 +65,10 @@ def fetch_page(url: str) -> str:
 
 
 def extract_rows(html: str) -> list[str]:
-    """
-    Pull the main content table off the page and return each row as a
-    normalised text string. Picks the table with the most rows on the page,
-    which in practice is the actual data table (nav/footer tables, if any,
-    are much smaller).
-    """
     soup = BeautifulSoup(html, "html.parser")
     tables = soup.find_all("table")
 
     if not tables:
-        # Fallback: no table found, treat list items in the main content
-        # area as "rows" instead, so the script still degrades gracefully.
         main = soup.find("main") or soup
         items = main.find_all("li")
         return [normalise(li.get_text(" ", strip=True)) for li in items if li.get_text(strip=True)]
@@ -109,6 +103,21 @@ def diff_rows(old_rows: list[str], new_rows: list[str]) -> dict:
     return {"added": added, "removed": removed}
 
 
+def send_whatsapp(message: str):
+    if not (WHATSAPP_PHONE and WHATSAPP_APIKEY):
+        print("WhatsApp not configured (missing env vars) - skipping.")
+        return
+    try:
+        resp = requests.get(
+            "https://api.callmebot.com/whatsapp.php",
+            params={"phone": WHATSAPP_PHONE, "text": message[:1000], "apikey": WHATSAPP_APIKEY},
+            timeout=20,
+        )
+        print(f"WhatsApp send status: {resp.status_code} - {resp.text[:200]}")
+    except Exception as e:
+        print(f"WhatsApp send failed: {e}")
+
+
 # ---------------------------------------------------------------------------
 # Email
 # ---------------------------------------------------------------------------
@@ -137,27 +146,43 @@ def send_email(subject: str, body_text: str, body_html: str | None = None):
     print(f"Email sent to {EMAIL_TO}")
 
 
-def build_email_body(added: list[str], removed: list[str]) -> tuple[str, str]:
-    lines = [f"Changes detected on:\n{TARGET_URL}\n"]
-    if added:
-        lines.append(f"\n🆕 {len(added)} new row(s):\n")
-        for r in added:
-            lines.append(f"  - {r[:400]}")
-    if removed:
-        lines.append(f"\n❌ {len(removed)} row(s) removed:\n")
-        for r in removed:
-            lines.append(f"  - {r[:400]}")
+def build_email_body(added: list[str], removed: list[str], row_count: int, changed: bool) -> tuple[str, str]:
+    if changed:
+        lines = [f"Changes detected on:\n{TARGET_URL}\n"]
+        if added:
+            lines.append(f"\n🆕 {len(added)} new row(s):\n")
+            for r in added:
+                lines.append(f"  - {r[:400]}")
+        if removed:
+            lines.append(f"\n❌ {len(removed)} row(s) removed:\n")
+            for r in removed:
+                lines.append(f"  - {r[:400]}")
+    else:
+        lines = [
+            f"Daily check complete — no changes.\n",
+            f"Page: {TARGET_URL}",
+            f"Rows on page: {row_count}",
+        ]
     text = "\n".join(lines)
 
-    html_rows_added = "".join(f"<li style='margin-bottom:8px'>{r}</li>" for r in added)
-    html_rows_removed = "".join(f"<li style='margin-bottom:8px'>{r}</li>" for r in removed)
-    html = f"""
-    <html><body style="font-family:sans-serif;">
-    <p>Changes detected on:<br><a href="{TARGET_URL}">{TARGET_URL}</a></p>
-    {f"<h3>🆕 New rows ({len(added)})</h3><ul>{html_rows_added}</ul>" if added else ""}
-    {f"<h3>❌ Removed rows ({len(removed)})</h3><ul>{html_rows_removed}</ul>" if removed else ""}
-    </body></html>
-    """
+    if changed:
+        html_rows_added = "".join(f"<li style='margin-bottom:8px'>{r}</li>" for r in added)
+        html_rows_removed = "".join(f"<li style='margin-bottom:8px'>{r}</li>" for r in removed)
+        html = f"""
+        <html><body style="font-family:sans-serif;">
+        <p>Changes detected on:<br><a href="{TARGET_URL}">{TARGET_URL}</a></p>
+        {f"<h3>🆕 New rows ({len(added)})</h3><ul>{html_rows_added}</ul>" if added else ""}
+        {f"<h3>❌ Removed rows ({len(removed)})</h3><ul>{html_rows_removed}</ul>" if removed else ""}
+        </body></html>
+        """
+    else:
+        html = f"""
+        <html><body style="font-family:sans-serif;">
+        <p>✅ Daily check complete — no changes.</p>
+        <p>Page: <a href="{TARGET_URL}">{TARGET_URL}</a><br>
+        Rows on page: {row_count}</p>
+        </body></html>
+        """
     return text, html
 
 
@@ -222,11 +247,20 @@ def main():
     elif changed:
         print(f"CHANGE DETECTED: +{len(diff['added'])} / -{len(diff['removed'])}")
         subject = f"🔔 Update on SARS Tariff Amendments 2026 page ({len(diff['added'])} new)"
-        text, html_body = build_email_body(diff["added"], diff["removed"])
+        text, html_body = build_email_body(diff["added"], diff["removed"], len(new_rows), changed=True)
         send_email(subject, text, html_body)
+        wa_lines = [f"🔔 SARS Tariff Amendments: {len(diff['added'])} new notice(s)"]
+        for r in diff["added"][:5]:
+            wa_lines.append(f"- {r[:150]}")
+        wa_lines.append(TARGET_URL)
+        send_whatsapp("\n".join(wa_lines))
         status = "changed"
     else:
         print("No changes.")
+        subject = "✅ Daily check: no changes — SARS Tariff Amendments 2026"
+        text, html_body = build_email_body([], [], len(new_rows), changed=False)
+        send_email(subject, text, html_body)
+        send_whatsapp(f"✅ SARS Tariff Amendments: no changes ({len(new_rows)} rows checked)")
         status = "unchanged"
 
     # persist new snapshot
