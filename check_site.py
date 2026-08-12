@@ -5,8 +5,7 @@ Website Watcher
 Fetches a target page, extracts the main table (the SARS tariff amendments
 table by default, but this works for any page with a comparable table/list
 structure), diffs it against the previous run, and:
-  - emails + WhatsApps the user every check (heartbeat if unchanged, alert if new rows found)
-  - takes a full-page screenshot and attaches it to the email
+  - emails the user if new rows/entries were found
   - writes data/history.json (log of every check, used by the dashboard)
   - writes data/last_snapshot.json (the current state, for the next diff)
 
@@ -44,6 +43,11 @@ SMTP_PASS = os.environ.get("SMTP_PASS", "")
 EMAIL_FROM = os.environ.get("EMAIL_FROM", SMTP_USER)
 WHATSAPP_PHONE = os.environ.get("WHATSAPP_PHONE", "")
 WHATSAPP_APIKEY = os.environ.get("WHATSAPP_APIKEY", "")
+GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "")  # auto-set by GitHub Actions, e.g. "UvenVen/SARS-Tariff-Watcher"
+SCREENSHOT_PUBLIC_URL = (
+    f"https://raw.githubusercontent.com/{GITHUB_REPOSITORY}/main/data/latest_screenshot.png"
+    if GITHUB_REPOSITORY else ""
+)
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SNAPSHOT_PATH = os.path.join(DATA_DIR, "last_snapshot.json")
@@ -69,10 +73,18 @@ def fetch_page(url: str) -> str:
 
 
 def extract_rows(html: str) -> list[str]:
+    """
+    Pull the main content table off the page and return each row as a
+    normalised text string. Picks the table with the most rows on the page,
+    which in practice is the actual data table (nav/footer tables, if any,
+    are much smaller).
+    """
     soup = BeautifulSoup(html, "html.parser")
     tables = soup.find_all("table")
 
     if not tables:
+        # Fallback: no table found, treat list items in the main content
+        # area as "rows" instead, so the script still degrades gracefully.
         main = soup.find("main") or soup
         items = main.find_all("li")
         return [normalise(li.get_text(" ", strip=True)) for li in items if li.get_text(strip=True)]
@@ -281,6 +293,8 @@ def main():
         for r in diff["added"][:5]:
             wa_lines.append(f"- {r[:150]}")
         wa_lines.append(TARGET_URL)
+        if screenshot_ok and SCREENSHOT_PUBLIC_URL:
+            wa_lines.append(f"📸 {SCREENSHOT_PUBLIC_URL}")
         send_whatsapp("\n".join(wa_lines))
         status = "changed"
     else:
@@ -288,7 +302,10 @@ def main():
         subject = "✅ Daily check: no changes — SARS Tariff Amendments 2026"
         text, html_body = build_email_body([], [], len(new_rows), changed=False)
         send_email(subject, text, html_body, attachment_path=screenshot_for_email)
-        send_whatsapp(f"✅ SARS Tariff Amendments: no changes ({len(new_rows)} rows checked)")
+        wa_no_change = f"✅ SARS Tariff Amendments: no changes ({len(new_rows)} rows checked)"
+        if screenshot_ok and SCREENSHOT_PUBLIC_URL:
+            wa_no_change += f"\n📸 {SCREENSHOT_PUBLIC_URL}"
+        send_whatsapp(wa_no_change)
         status = "unchanged"
 
     # persist new snapshot
