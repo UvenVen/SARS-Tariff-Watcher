@@ -247,6 +247,10 @@
     </div>
   </div>
 
+  <img id="screenshot" src="data/latest_screenshot.png" alt="Latest page screenshot"
+       style="width:100%; border:1px solid var(--paper-line); border-radius:4px; display:none; margin-bottom:32px;"
+       onload="this.style.display='block'" onerror="this.style.display='none'">
+
   <p class="log-heading">Check history</p>
   <div id="log"></div>
   <div class="empty-state" id="empty-state" style="display:none;">No checks logged yet. Once the daily job runs, entries will appear here.</div>
