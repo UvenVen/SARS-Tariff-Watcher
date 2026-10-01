@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-10-01T18:41:17.639341+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 75
+  },
+  {
     "timestamp": "2026-10-01T12:40:53.762569+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1667,13 +1675,5 @@
       "6 August 2026 GG 55153 R.7794 Amendment to Part 1 of Schedule No. 1, by the substitution of tariff subheadings 1001.91 and 1001.99 as well as 1101.00.10, 1101.00.20, 1101.00.30 and 1101.00.90, to redu"
     ],
     "row_count": 60
-  },
-  {
-    "timestamp": "2026-08-13T08:11:45.837424+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 58
   }
 ]
