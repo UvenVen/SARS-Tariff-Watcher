@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-10-12T21:32:21.474457+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 76
+  },
+  {
     "timestamp": "2026-10-12T14:45:16.173178+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1647,16 +1655,6 @@
     "added_count": 0,
     "removed_count": 0,
     "added_preview": [],
-    "row_count": 60
-  },
-  {
-    "timestamp": "2026-08-24T02:21:59.806740+00:00",
-    "status": "changed",
-    "added_count": 1,
-    "removed_count": 1,
-    "added_preview": [
-      "14 August 2026 New! GG 55190 R.7809 Amendment to Part 2 of Schedule No.4, by the insertion of rebate item 460.07/4011.70.10/01.08, in order to provide for a rebate provision for the importation of new"
-    ],
     "row_count": 60
   }
 ]
