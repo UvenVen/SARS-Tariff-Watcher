@@ -1,5 +1,18 @@
 [
   {
+    "timestamp": "2026-10-15T17:35:04.115829+00:00",
+    "status": "changed",
+    "added_count": 4,
+    "removed_count": 1,
+    "added_preview": [
+      "16 October 2026 New! GG R Amendment of provisional payment in relation to anti-dumping duties against the alleged dumping of flat-rolled products of iron or non-alloy steel, of a width of 600 mm or mo",
+      "16 October 2026 New! GG R Amendment to Part 1 of Schedule No.1, by the substitution of tariff subheading 4801.00, in order to increase the general rate of customs duty on newsprint, in rolls or sheets",
+      "16 October 2026 New! GG R Imposition of provisional payment in relation to safeguard duties against the alleged increase on imports of office paper, classifiable under tariff subheadings 4802.56.20 an",
+      "9 October 2026 GG 55506 R.7991 Amendment to Part 1 of Schedule No. 2, by the substitution of various items under item 215.02 in order to list the rebate items intended to be excluded from the applicab"
+    ],
+    "row_count": 79
+  },
+  {
     "timestamp": "2026-10-15T11:01:42.693550+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1642,13 +1655,5 @@
       "14 August 2026 GG 55190 R.7809 Amendment to Part 2 of Schedule No. 4, by the insertion of rebate item 460.07/4011.70.10/01.08, in order to provide for a rebate provision for the importation of new pne"
     ],
     "row_count": 62
-  },
-  {
-    "timestamp": "2026-08-27T10:54:45.874827+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 60
   }
 ]
