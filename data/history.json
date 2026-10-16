@@ -1,5 +1,17 @@
 [
   {
+    "timestamp": "2026-10-16T10:57:31.693607+00:00",
+    "status": "changed",
+    "added_count": 3,
+    "removed_count": 3,
+    "added_preview": [
+      "16 October 2026 New! GG 55544 R.8023 Amendment of provisional payment in relation to anti-dumping duties against the alleged dumping of flat-rolled products of iron or non-alloy steel, of a width of 6",
+      "16 October 2026 New! GG 55544 R.8025 Amendment to Part 1 of Schedule No.1, by the substitution of tariff subheading 4801.00, in order to increase the general rate of customs duty on newsprint, in roll",
+      "16 October 2026 New! GG 55544 R.8024 Imposition of provisional payment in relation to safeguard duties against the alleged increase on imports of office paper, classifiable under tariff subheadings 48"
+    ],
+    "row_count": 79
+  },
+  {
     "timestamp": "2026-10-16T05:28:01.484108+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1637,14 +1649,6 @@
   },
   {
     "timestamp": "2026-08-28T03:54:10.285313+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 62
-  },
-  {
-    "timestamp": "2026-08-27T22:45:47.730452+00:00",
     "status": "unchanged",
     "added_count": 0,
     "removed_count": 0,
