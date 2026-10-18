@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-10-18T22:00:06.683816+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 79
+  },
+  {
     "timestamp": "2026-10-18T16:20:32.605242+00:00",
     "status": "changed",
     "added_count": 3,
@@ -1646,14 +1654,6 @@
   },
   {
     "timestamp": "2026-08-30T11:29:37.206953+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 62
-  },
-  {
-    "timestamp": "2026-08-30T06:14:55.857571+00:00",
     "status": "unchanged",
     "added_count": 0,
     "removed_count": 0,
