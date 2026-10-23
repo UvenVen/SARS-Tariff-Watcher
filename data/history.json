@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-10-23T05:44:54.966235+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 79
+  },
+  {
     "timestamp": "2026-10-22T22:50:05.248803+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1651,13 +1659,5 @@
       "4 September 2026 New! GG R Amendment to Part 3 of Schedule No. 2, by the substitution of various items under item 260.03, in order to include imports originating in or imported from South Korea to be "
     ],
     "row_count": 65
-  },
-  {
-    "timestamp": "2026-09-03T10:52:01.391164+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 62
   }
 ]
