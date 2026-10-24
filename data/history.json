@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-10-24T05:23:47.393276+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 79
+  },
+  {
     "timestamp": "2026-10-23T22:43:03.497090+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1647,13 +1655,5 @@
       "4 September 2026 New! GG 55298 R.7875 Amendment to Part 3 of Schedule No. 2, by the substitution of various items under item 260.03, in order to include imports originating in or imported from South K"
     ],
     "row_count": 66
-  },
-  {
-    "timestamp": "2026-09-04T10:51:26.967831+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 65
   }
 ]
