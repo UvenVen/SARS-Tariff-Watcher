@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-10-30T06:48:57.814085+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 81
+  },
+  {
     "timestamp": "2026-10-29T23:41:20.953189+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1646,13 +1654,5 @@
       "4 September 2026 GG 55338 R.7888 Amendment to Part 1 of Schedule No. 2, by the insertion of various items under item 213.03 and 217.02, in order to impose anti-dumping duties on imports of windscreens"
     ],
     "row_count": 69
-  },
-  {
-    "timestamp": "2026-09-10T10:52:57.345223+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 66
   }
 ]
