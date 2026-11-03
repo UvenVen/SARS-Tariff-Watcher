@@ -1,5 +1,16 @@
 [
   {
+    "timestamp": "2026-11-03T19:56:57.833057+00:00",
+    "status": "changed",
+    "added_count": 2,
+    "removed_count": 2,
+    "added_preview": [
+      "3 November 2026 New! GG 55661 R.8125 Amendment to Part 3 of Schedule No. 6, as a consequence of the reduction in the general fuel levy as announced by the Minister of Finance on 21 October 2026; the d",
+      "3 November 2026 New! GG 55661 R.8124 Amendment to Part 5A of Schedule No. 1, to provide for a reduction of 150c/li in the rate of the general fuel levy from 410c/li to 260c/li on petrol and a reductio"
+    ],
+    "row_count": 83
+  },
+  {
     "timestamp": "2026-11-03T13:48:48.876864+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1639,14 +1650,6 @@
   },
   {
     "timestamp": "2026-09-15T05:50:13.843626+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 69
-  },
-  {
-    "timestamp": "2026-09-14T22:49:57.929087+00:00",
     "status": "unchanged",
     "added_count": 0,
     "removed_count": 0,
