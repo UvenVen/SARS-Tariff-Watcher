@@ -1,5 +1,19 @@
 [
   {
+    "timestamp": "2026-11-19T15:25:04.553360+00:00",
+    "status": "changed",
+    "added_count": 6,
+    "removed_count": 1,
+    "added_preview": [
+      "20 November 2026 New! GG R Amendment to Part 1 of Schedule No. 1, by the substitution of various tariff subheadings, to implement the phase down rates of customs duties in terms of the African Contine",
+      "20 November 2026 New! GG R Amendment to Part 1 of Schedule No. 1, to provide for technical amendments, by the insertion of new 8-digit tariff subheadings under Chapters 3, 29, 39, 70, 73, 74, 82, 83, ",
+      "20 November 2026 New! GG R Amendment to Part 1 of Schedule No. 3, by the deletion of rebate item 320.01/8302.42.90/01.08 as well as the insertion of rebate item 320.01/8302.42.9/01.07 and the substitu",
+      "20 November 2026 New! GG R Amendment to Part 2 of Schedule No. 4, by the substitution of rebate item 460.17/00.00/04.00 in order to delete the reference to tariff subheading 8201.52.15 as this item ha",
+      "20 November 2026 New! GG R Amendment to Part 3 of Schedule No. 5, by the substitution of rebate item 538.00/00.00/04.00 in order to delete the reference to tariff subheading 8201.53.15 as this item ha"
+    ],
+    "row_count": 95
+  },
+  {
     "timestamp": "2026-11-18T22:43:45.181002+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1648,14 +1662,6 @@
   },
   {
     "timestamp": "2026-09-30T18:17:05.699337+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 75
-  },
-  {
-    "timestamp": "2026-09-30T12:07:19.644239+00:00",
     "status": "unchanged",
     "added_count": 0,
     "removed_count": 0,
