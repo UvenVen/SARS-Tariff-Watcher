@@ -1,5 +1,19 @@
 [
   {
+    "timestamp": "2026-11-20T15:01:45.638226+00:00",
+    "status": "changed",
+    "added_count": 5,
+    "removed_count": 5,
+    "added_preview": [
+      "20 November 2026 New! GG 55748 R.8193 Amendment to Part 1 of Schedule No. 1, by the substitution of various tariff subheadings, to implement the phase down rates of customs duties in terms of the Afri",
+      "20 November 2026 New! GG 55748 R.8192 Amendment to Part 1 of Schedule No. 1, to provide for technical amendments, by the insertion of new 8-digit tariff subheadings under Chapters 3, 29, 39, 70, 73, 7",
+      "20 November 2026 New! GG 55748 R.8191 Amendment to Part 1 of Schedule No. 3, by the deletion of rebate item 320.01/8302.42.90/01.08 as well as the insertion of rebate item 320.01/8302.42.9/01.07 and t",
+      "20 November 2026 New! GG 55748 R.8190 Amendment to Part 2 of Schedule No. 4, by the substitution of rebate item 460.17/00.00/04.00 in order to delete the reference to tariff subheading 8201.52.15 as t",
+      "20 November 2026 New! GG 55748 R.8189 Amendment to Part 3 of Schedule No. 5, by the substitution of rebate item 538.00/00.00/04.00 in order to delete the reference to tariff subheading 8201.53.15 as t"
+    ],
+    "row_count": 95
+  },
+  {
     "timestamp": "2026-11-19T22:47:47.247934+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1654,14 +1668,6 @@
   },
   {
     "timestamp": "2026-10-01T18:41:17.639341+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 75
-  },
-  {
-    "timestamp": "2026-10-01T12:40:53.762569+00:00",
     "status": "unchanged",
     "added_count": 0,
     "removed_count": 0,
