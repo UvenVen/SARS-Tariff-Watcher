@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-11-27T00:08:02.602783+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 95
+  },
+  {
     "timestamp": "2026-11-26T22:47:17.100032+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1665,13 +1673,5 @@
       "18 September 2026 GG 55424 R.7939 Amendment to Part 1 of Schedule No. 2, by the substitution of various items under item 215.02, in order to increase the anti-dumping duties on imports of flat-rolled "
     ],
     "row_count": 76
-  },
-  {
-    "timestamp": "2026-10-08T07:00:46.500079+00:00",
-    "status": "unchanged",
-    "added_count": 0,
-    "removed_count": 0,
-    "added_preview": [],
-    "row_count": 75
   }
 ]
