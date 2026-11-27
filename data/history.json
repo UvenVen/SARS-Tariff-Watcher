@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-11-27T16:19:54.992329+00:00",
+    "status": "unchanged",
+    "added_count": 0,
+    "removed_count": 0,
+    "added_preview": [],
+    "row_count": 95
+  },
+  {
     "timestamp": "2026-11-27T00:08:02.602783+00:00",
     "status": "unchanged",
     "added_count": 0,
@@ -1658,20 +1666,6 @@
     "added_count": 0,
     "removed_count": 0,
     "added_preview": [],
-    "row_count": 76
-  },
-  {
-    "timestamp": "2026-10-08T13:13:44.680733+00:00",
-    "status": "changed",
-    "added_count": 7,
-    "removed_count": 6,
-    "added_preview": [
-      "9 October 2026 New! GG R Amendment to Part 1 of Schedule No. 2, by the substitution of various items under item 215.02 in order to list the rebate items intended to be excluded from the applicable ant",
-      "18 September 2026 GG 55406 R.7920 Amendment to Part 3 of Schedule No. 6 by the substitution of Notes 6(a)(iii)(aa), 6(a)(vii), and 6(b)(iii)(aa), as published in Government Gazette No. 46056 dated 18 ",
-      "18 September 2026 GG55424 R.7937 Amendment to Part 1 of Schedule No. 2, by the insertion of various items under item 215.02, in order to impose anti-dumping duties on imports of flat-rolled products o",
-      "18 September 2026 GG 55424 R.7938 Amendment to Part 1 of Schedule No. 2, by the substitution of various items under item 215.02, in order to increase the anti-dumping duties on imports of flat-rolled ",
-      "18 September 2026 GG 55424 R.7939 Amendment to Part 1 of Schedule No. 2, by the substitution of various items under item 215.02, in order to increase the anti-dumping duties on imports of flat-rolled "
-    ],
     "row_count": 76
   }
 ]
